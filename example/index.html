@@ -25,6 +25,7 @@
 
       ul {
         display: flex;
+	      flex-wrap: wrap;
       }
 
       li {
@@ -71,29 +72,74 @@
         background: #dadada;
       }
 
+      .format-badge {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        font-size: 10px;
+        font-family: sans-serif;
+        padding: 5px 10px;
+        background: #fff;
+      }
+
+      .airing-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 10px;
+        font-family: sans-serif;
+        padding: 5px 10px;
+        background:#18a939;
+        color:#fff;
+      }
+      .status-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 10px;
+        font-family: sans-serif;
+        padding: 5px 10px;
+        background: #1842a9;
+        color:#fff;
+      }
+
     </style>
   </head>
   <body>
-
     <div id="app">
       <ul>
         <li v-for="show in shows">
+          <span class="format-badge">{{ show.format | replaceUnderscore }}</span>
+          <span class="airing-badge" v-if="show.nextAiringEpisode">{{ show.nextAiringEpisode.airingAt | untilDate}}</span>
+          <span class="status-badge" v-if="!show.nextAiringEpisode">{{ show.status | replaceUnderscore }}</span>
           <a :href="'https://myanimelist.net/anime/' + show.idMal" target="_blank">
             <img :src="show.coverImage.large" :title="show.title.romaji" />
           </a>
+
           <p>
             {{ show.title.romaji }}
-            <span v-if="show.title.english !== show.title.romaji"><br><small>{{ show.title.english }}</small></span>
+            <span v-if="show.title.english !== show.title.romaji"></span>
           </p>
         </li>
         <li class="load-more"><button v-if="hasMoreShows" v-on:click="loadMore">Next page</button></li>
       </ul>
     </div>
 
-    <script src="https://unpkg.com/sweet-scroll/sweet-scroll.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="../currentlyAiringAnime.js"></script>
     <script>
+      Vue.filter('untilDate', function(value) {
+        if (value) {
+          return 'Airs ' + moment.unix(value).fromNow()
+        }
+      });
+
+      Vue.filter('replaceUnderscore', function(value) {
+        if (value) {
+          return value.replace('_', ' ');
+        }
+      });
+
       var getNextShows;
 
       var app = new Vue({
@@ -113,8 +159,6 @@
             if (getNextShows) {
               getNextShows().then(renderShows.bind(this))
             }
-
-            console.log('load More!');
           }
         }
       })
@@ -124,11 +168,6 @@
         getNextShows = result.next;
         this.hasMoreShows = !!result.next;
       }
-
-      var sweetScroll = new SweetScroll({
-        horizontalScroll: true,
-        verticalScoll: false
-      });
     </script>
   </body>
 </html>

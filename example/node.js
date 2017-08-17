@@ -4,6 +4,6 @@ global.fetch = fetch
 
 import currentlyAiringAnime from '../currentlyAiringAnime'
 
-currentlyAiringAnime().then(result => {
-  console.log('first', result)
+currentlyAiringAnime().then(({shows, next}) => {
+  console.log(shows)
 })
