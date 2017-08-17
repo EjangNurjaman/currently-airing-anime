@@ -47,13 +47,23 @@ var requestOptions = {
         'Accept': 'application/json',
     }
 };
-var airingAnimeQuery = "\n  query (\n    $page: Int\n    $season: MediaSeason\n    $seasonYear: Int\n  ) {\n    Page (page: $page) {\n      pageInfo {\n        total\n        currentPage\n        lastPage\n        hastNextPage\n        perPage\n      }\n\n      media(season: $season, seasonYear: $seasonYear) {\n        id\n        idMal\n        title {\n          romaji\n          english\n          native\n        }\n        studios {\n          edges {\n            node {\n              name\n            }\n          }\n        }\n        genres\n        status\n        coverImage {\n          large\n        }\n        episodes\n        nextAiringEpisode {\n          id\n          episode\n          airingAt\n          timeUntilAiring\n        }\n        airingSchedule {\n          edges {\n            node {\n              episode\n              airingAt\n              timeUntilAiring\n            }\n          }\n        }\n      }\n    }\n  }\n";
+var airingAnimeQuery = "\n  query (\n    $page: Int\n    $season: MediaSeason\n\t\t$seasonYear: Int\n\t\t$malIdIn: [Int]\n\t\t$aniIdIn: [Int]\n\t\t$sort: [MediaSort]\n  ) {\n    Page (page: $page) {\n      pageInfo {\n        total\n        currentPage\n        lastPage\n        hastNextPage\n        perPage\n      }\n\n      media(\n\t\t\t\tseason: $season,\n\t\t\t\tseasonYear: $seasonYear\n\t\t\t\tidMal_in: $malIdIn,\n\t\t\t\tid_in: $aniIdIn,\n\t\t\t\tsort: $sort\n\t\t\t) {\n        id\n        idMal\n        title {\n          romaji\n        }\n        studios {\n          edges {\n            node {\n              name\n            }\n          }\n\t\t\t\t}\n\t\t\t\tformat\n        genres\n        status\n        coverImage {\n          large\n        }\n        episodes\n        nextAiringEpisode {\n          id\n          episode\n          airingAt\n          timeUntilAiring\n        }\n        airingSchedule {\n          edges {\n            node {\n              episode\n              airingAt\n              timeUntilAiring\n            }\n          }\n        }\n      }\n    }\n  }\n";
 // WINTER: Months December to February
 // SPRING: Months March to Spring
 // SUMMER: Months June to August
 // FALL: Months September to November
 function getCurrentSeason() {
-    return 'SUMMER';
+    var month = (new Date()).getMonth() + 1; // Add 1 because getMonth starts a 0
+    if (month === 12 || (month >= 1 && month <= 2)) {
+        return 'WINTER';
+    }
+    if (month >= 3 && month <= 5) {
+        return 'SPRING';
+    }
+    if (month >= 6 && month <= 8) {
+        return 'SUMMER';
+    }
+    return 'FALL';
 }
 function getCurrentSeasonYear() {
     return (new Date()).getFullYear();
@@ -94,7 +104,10 @@ function currentlyAiringAnime(options) {
                             return [4 /*yield*/, makeRequest({
                                     page: page,
                                     season: options.season,
-                                    seasonYear: options.seasonYear
+                                    seasonYear: options.seasonYear,
+                                    malIdIn: options.malIdIn,
+                                    aniIdIn: options.aniIdIn,
+                                    sort: options.sort
                                 })];
                         case 1:
                             data = (_a.sent()).data;
@@ -111,9 +124,18 @@ function currentlyAiringAnime(options) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    page = 0;
                     options.season = options.season || getCurrentSeason();
                     options.seasonYear = options.seasonYear || getCurrentSeasonYear();
+                    options.malIdIn = options.malIdIn || undefined;
+                    options.aniIdIn = options.aniIdIn || undefined;
+                    options.sort = options.sort || ['START_DATE'];
+                    if (options.malIdIn !== undefined && !Array.isArray(options.malIdIn)) {
+                        throw new Error('malIdIn should be an array');
+                    }
+                    if (options.aniIdIn !== undefined && !Array.isArray(options.aniIdIn)) {
+                        throw new Error('malIdIn should be an array');
+                    }
+                    page = 0;
                     return [4 /*yield*/, request()];
                 case 1: return [2 /*return*/, _a.sent()];
             }

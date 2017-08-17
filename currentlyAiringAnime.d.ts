@@ -1,10 +1,12 @@
 export declare type Season = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
+export declare type MediaSort = 'ID' | 'ID_DESC' | 'TITLE_ROMAJI' | 'TITLE_ROMAJI_DESC' | 'TITLE_ENGLISH' | 'TITLE_ENGLISH_DESC' | 'TITLE_NATIVE' | 'TITLE_NATIVE_DESC' | 'TYPE' | 'TYPE_DESC' | 'FORMAT' | 'FORMAT_DESC' | 'START_DATE' | 'START_DATE_DESC' | 'END_DATE' | 'END_DATE_DESC' | 'SCORE' | 'SCORE_DESC' | 'POPULARITY' | 'POPULARITY_DESC' | 'EPISODES' | 'EPISODES_DESC' | 'DURATION' | 'DURATION_DESC' | 'STATUS' | 'STATUS_DESC' | 'UPDATED_AT' | 'UPDATED_AT_DESC';
 export declare type Options = {
-    malId?: number | number[];
-    aniId?: number | number[];
+    malIdIn?: number | number[];
+    aniIdIn?: number | number[];
     userId?: number | number[];
     season?: Season;
     seasonYear?: number | number[];
+    sort?: [string];
 };
 export declare type AiringEpisode = {
     id: number;

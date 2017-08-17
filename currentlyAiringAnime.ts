@@ -1,11 +1,42 @@
 export type Season = 'WINTER'|'SPRING'|'SUMMER'|'FALL'
 
+export type MediaSort =
+	'ID'|
+	'ID_DESC'|
+	'TITLE_ROMAJI'|
+	'TITLE_ROMAJI_DESC'|
+	'TITLE_ENGLISH'|
+	'TITLE_ENGLISH_DESC'|
+	'TITLE_NATIVE'|
+	'TITLE_NATIVE_DESC'|
+	'TYPE'|
+	'TYPE_DESC'|
+	'FORMAT'|
+	'FORMAT_DESC'|
+	'START_DATE'|
+	'START_DATE_DESC'|
+	'END_DATE'|
+	'END_DATE_DESC'|
+	'SCORE'|
+	'SCORE_DESC'|
+	'POPULARITY'|
+	'POPULARITY_DESC'|
+	'EPISODES'|
+	'EPISODES_DESC'|
+	'DURATION'|
+	'DURATION_DESC'|
+	'STATUS'|
+	'STATUS_DESC'|
+	'UPDATED_AT'|
+	'UPDATED_AT_DESC';
+
 export type Options = {
-  malId?: number|number[]
-  aniId?: number|number[]
+  malIdIn?: number|number[]
+  aniIdIn?: number|number[]
   userId?: number|number[]
   season?: Season
-  seasonYear?: number|number[]
+	seasonYear?: number|number[]
+	sort?: [string]
 }
 
 type PageInfo = {
@@ -83,7 +114,10 @@ const airingAnimeQuery = `
   query (
     $page: Int
     $season: MediaSeason
-    $seasonYear: Int
+		$seasonYear: Int
+		$malIdIn: [Int]
+		$aniIdIn: [Int]
+		$sort: [MediaSort]
   ) {
     Page (page: $page) {
       pageInfo {
@@ -94,13 +128,17 @@ const airingAnimeQuery = `
         perPage
       }
 
-      media(season: $season, seasonYear: $seasonYear) {
+      media(
+				season: $season,
+				seasonYear: $seasonYear
+				idMal_in: $malIdIn,
+				id_in: $aniIdIn,
+				sort: $sort
+			) {
         id
         idMal
         title {
           romaji
-          english
-          native
         }
         studios {
           edges {
@@ -108,7 +146,8 @@ const airingAnimeQuery = `
               name
             }
           }
-        }
+				}
+				format
         genres
         status
         coverImage {
@@ -139,13 +178,26 @@ const airingAnimeQuery = `
 // SPRING: Months March to Spring
 // SUMMER: Months June to August
 // FALL: Months September to November
-
 function getCurrentSeason(): Season {
-  return 'SUMMER'
+ 	const month = (new Date()).getMonth() + 1 // Add 1 because getMonth starts a 0
+
+	if (month === 12 || (month >= 1 && month <= 2)) {
+		return 'WINTER'
+	}
+
+	if (month >= 3 && month <= 5) {
+		return 'SPRING'
+	}
+
+	if (month >= 6 && month <= 8) {
+		return 'SUMMER'
+	}
+
+  return 'FALL'
 }
 
 function getCurrentSeasonYear(): number {
-  return (new Date()).getFullYear();
+  return (new Date()).getFullYear()
 }
 
 async function makeRequest(variables: object): Promise<ApiResponse> {
@@ -165,18 +217,31 @@ async function makeRequest(variables: object): Promise<ApiResponse> {
 }
 
 async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime> {
+  options.season = options.season || getCurrentSeason()
+  options.seasonYear = options.seasonYear || getCurrentSeasonYear()
+	options.malIdIn = options.malIdIn || undefined
+	options.aniIdIn = options.aniIdIn || undefined
+	options.sort = options.sort || ['START_DATE'];
+
+	if (options.malIdIn !== undefined && !Array.isArray(options.malIdIn)) {
+		throw new Error('malIdIn should be an array')
+	}
+
+	if (options.aniIdIn !== undefined && !Array.isArray(options.aniIdIn)) {
+		throw new Error('malIdIn should be an array')
+	}
+
   let page = 0
-
-  options.season = options.season || getCurrentSeason();
-  options.seasonYear = options.seasonYear || getCurrentSeasonYear();
-
   async function request(): Promise<AiringAnime> {
     page++
 
     const {data} = await makeRequest({
       page: page,
       season: options.season,
-      seasonYear: options.seasonYear
+			seasonYear: options.seasonYear,
+			malIdIn: options.malIdIn,
+			aniIdIn: options.aniIdIn,
+			sort: options.sort
     })
 
     const hasNextPage = data.Page.pageInfo.hastNextPage
