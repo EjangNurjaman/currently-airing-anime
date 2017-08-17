@@ -2,6 +2,8 @@
 
 Currently Airing Anime is a simple package that allows you to retrieve currently airing anime from AniList.
 
+[Demo](https://ricklancee.github.io/currently-airing-anime/) | [Demo source code](https://github.com/ricklancee/currently-airing-anime/blob/gh-pages/index.html)
+
 ```js
 const currentlyAiringAnime = require('currently-airing-anime')
 
