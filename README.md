@@ -99,11 +99,11 @@ npm install node-fetch
 ```
 
 ```js
-import fetch from 'node-fetch'
+const fetch = require('node-fetch');
 
 global.fetch = fetch
 
-import currentlyAiringAnime from '../currentlyAiringAnime'
+const currentlyAiringAnime = require('currently-airing-anime');
 
 currentlyAiringAnime().then(({shows, next}) => {
   console.log(shows)
