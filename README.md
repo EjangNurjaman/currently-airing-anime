@@ -7,13 +7,17 @@ import currentlyAiringAnime from 'currently-airing-anime'
 
 currentlyAiringAnime().then(({shows, next}) => {
 
-  console.log(shows) // --> logs up an array containing up to 50 array airing anime shows
+  // logs up an array containing up to 50 array airing anime shows
+  // See below for which properties the object contains.
+  console.log(shows)
 
   // The next variable allows for paginating to the next 50 items.
   if (next) {
 
     next().then(({shows, next}) => {
-      console.log(shows) // --> logs shows    
+      
+      // logs shows
+      console.log(shows) 
   
       if (next) {
         // ...
@@ -35,6 +39,48 @@ currentlyAiringAnime({
 ```
 
 See the `example/` folder for an implementation example for the browser.
+
+
+#### Show object
+
+```
+show {
+  id
+  idMal
+  title {
+    romaji
+  }
+  studios {
+    edges {
+      node {
+        name
+      }
+    }
+  }
+  format
+  genres
+  status
+  coverImage {
+    large
+  }
+  episodes
+  nextAiringEpisode {
+    id
+    episode
+    airingAt
+    timeUntilAiring
+  }
+  airingSchedule {
+    edges {
+      node {
+        episode
+        airingAt
+        timeUntilAiring
+      }
+    }
+  }
+}
+```
 
 ### Installing
 
