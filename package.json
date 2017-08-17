@@ -8,6 +8,10 @@
   "main": "currentlyAiringAnime.js",
   "types": "currentlyAiringAnime.d.ts",
   "author": "Rick Lancee <https://github.com/ricklancee/>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricklancee/currently-airing-anime.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.24.1",
