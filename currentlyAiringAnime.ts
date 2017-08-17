@@ -139,6 +139,8 @@ const airingAnimeQuery = `
         idMal
         title {
           romaji
+          native
+          english
         }
         studios {
           edges {

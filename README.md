@@ -15,7 +15,7 @@ currentlyAiringAnime().then(({shows, next}) => {
   if (next) {
 
     next().then(({shows, next}) => {
-      
+
       // logs shows
       console.log(shows) 
   
@@ -34,7 +34,7 @@ currentlyAiringAnime({
   seasonYear: 2017,
   malIdIn: [34914, 34902, 34881], // Include only these MyAnimeList Ids
   aniIdIn: [98292, 98291, 98251], // Include only these AniList ids
-  sort: ['START_DATE'] // An array of sort options (see below for all ssort options)
+  sort: ['START_DATE'] // An array of sort options (see below for all sort options)
 })
 ```
 
@@ -49,6 +49,8 @@ show {
   idMal
   title {
     romaji
+    native
+    english
   }
   studios {
     edges {
