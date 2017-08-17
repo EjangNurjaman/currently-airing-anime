@@ -3,7 +3,7 @@
 Currently Airing Anime is a simple package that allows you to retrieve currently airing anime from AniList.
 
 ```js
-import currentlyAiringAnime from 'currently-airing-anime'
+const currentlyAiringAnime = require('currently-airing-anime')
 
 currentlyAiringAnime().then(({shows, next}) => {
 
@@ -139,10 +139,6 @@ DURATION
 DURATION_DESC
 STATUS
 STATUS_DESC
-CHAPTERS
-CHAPTERS_DESC
-VOLUMES
-VOLUMES_DESC
 UPDATED_AT
 UPDATED_AT_DESC
 ```
