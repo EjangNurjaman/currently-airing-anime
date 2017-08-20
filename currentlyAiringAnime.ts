@@ -43,7 +43,7 @@ type PageInfo = {
   total: number
   currentPage: number
   lastPage: number
-  hastNextPage: boolean
+  hasNextPage: boolean
   perPage: number
 }
 
@@ -124,7 +124,7 @@ const airingAnimeQuery = `
         total
         currentPage
         lastPage
-        hastNextPage
+        hasNextPage
         perPage
       }
 
@@ -246,7 +246,7 @@ async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime>
       sort: options.sort
     })
 
-    const hasNextPage = data.Page.pageInfo.hastNextPage
+    const hasNextPage = data.Page.pageInfo.hasNextPage
 
     return {
       shows: data.Page.media,
