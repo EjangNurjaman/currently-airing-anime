@@ -49,6 +49,7 @@ See the `example/` folder for an implementation example for the browser.
 show {
   id
   idMal
+  description
   title {
     romaji
     native

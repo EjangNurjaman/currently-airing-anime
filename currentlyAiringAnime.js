@@ -47,7 +47,7 @@ var requestOptions = {
         'Accept': 'application/json',
     }
 };
-var airingAnimeQuery = "\n  query (\n    $page: Int\n    $season: MediaSeason\n\t\t$seasonYear: Int\n\t\t$malIdIn: [Int]\n\t\t$aniIdIn: [Int]\n\t\t$sort: [MediaSort]\n  ) {\n    Page (page: $page) {\n      pageInfo {\n        total\n        currentPage\n        lastPage\n        hasNextPage\n        perPage\n      }\n\n      media(\n\t\t\t\tseason: $season,\n\t\t\t\tseasonYear: $seasonYear\n\t\t\t\tidMal_in: $malIdIn,\n\t\t\t\tid_in: $aniIdIn,\n\t\t\t\tsort: $sort\n\t\t\t) {\n        id\n        idMal\n        title {\n          romaji\n          native\n          english\n        }\n        studios {\n          edges {\n            node {\n              name\n            }\n          }\n\t\t\t\t}\n\t\t\t\tformat\n        genres\n        status\n        coverImage {\n          large\n        }\n        episodes\n        nextAiringEpisode {\n          id\n          episode\n          airingAt\n          timeUntilAiring\n        }\n        airingSchedule {\n          edges {\n            node {\n              episode\n              airingAt\n              timeUntilAiring\n            }\n          }\n        }\n      }\n    }\n  }\n";
+var airingAnimeQuery = "\n  query (\n    $page: Int\n    $season: MediaSeason\n\t\t$seasonYear: Int\n\t\t$malIdIn: [Int]\n\t\t$aniIdIn: [Int]\n\t\t$sort: [MediaSort]\n  ) {\n    Page (page: $page) {\n      pageInfo {\n        total\n        currentPage\n        lastPage\n        hasNextPage\n        perPage\n      }\n\n      media(\n\t\t\t\tseason: $season,\n\t\t\t\tseasonYear: $seasonYear\n\t\t\t\tidMal_in: $malIdIn,\n\t\t\t\tid_in: $aniIdIn,\n        sort: $sort\n        status: RELEASING\n\t\t\t) {\n        id\n        description\n        idMal\n        title {\n          romaji\n          native\n          english\n        }\n        studios {\n          edges {\n            node {\n              name\n            }\n          }\n\t\t\t\t}\n\t\t\t\tformat\n        genres\n        status\n        coverImage {\n          large\n        }\n        episodes\n        nextAiringEpisode {\n          id\n          episode\n          airingAt\n          timeUntilAiring\n        }\n        airingSchedule {\n          edges {\n            node {\n              episode\n              airingAt\n              timeUntilAiring\n            }\n          }\n        }\n      }\n    }\n  }\n";
 // WINTER: Months December to February
 // SPRING: Months March to Spring
 // SUMMER: Months June to August
@@ -96,19 +96,22 @@ function currentlyAiringAnime(options) {
     return __awaiter(this, void 0, void 0, function () {
         function request() {
             return __awaiter(this, void 0, void 0, function () {
-                var data, hasNextPage;
+                var requestOptions, data, hasNextPage;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             page++;
-                            return [4 /*yield*/, makeRequest({
-                                    page: page,
-                                    season: options.season,
-                                    seasonYear: options.seasonYear,
-                                    malIdIn: options.malIdIn,
-                                    aniIdIn: options.aniIdIn,
-                                    sort: options.sort
-                                })];
+                            requestOptions = {
+                                page: page,
+                                malIdIn: options.malIdIn,
+                                aniIdIn: options.aniIdIn,
+                                sort: options.sort
+                            };
+                            if (options.season && options.seasonYear) {
+                                requestOptions['season'] = options.season;
+                                requestOptions['seasonYear'] = options.seasonYear;
+                            }
+                            return [4 /*yield*/, makeRequest(requestOptions)];
                         case 1:
                             data = (_a.sent()).data;
                             hasNextPage = data.Page.pageInfo.hasNextPage;
@@ -124,8 +127,10 @@ function currentlyAiringAnime(options) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    options.season = options.season || getCurrentSeason();
-                    options.seasonYear = options.seasonYear || getCurrentSeasonYear();
+                    if (options.season === undefined || options.seasonYear === undefined) {
+                        options.season = getCurrentSeason();
+                        options.seasonYear = getCurrentSeasonYear();
+                    }
                     options.malIdIn = options.malIdIn || undefined;
                     options.aniIdIn = options.aniIdIn || undefined;
                     options.sort = options.sort || ['START_DATE'];

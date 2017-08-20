@@ -133,9 +133,11 @@ const airingAnimeQuery = `
 				seasonYear: $seasonYear
 				idMal_in: $malIdIn,
 				id_in: $aniIdIn,
-				sort: $sort
+        sort: $sort
+        status: RELEASING
 			) {
         id
+        description
         idMal
         title {
           romaji
@@ -219,8 +221,11 @@ async function makeRequest(variables: object): Promise<ApiResponse> {
 }
 
 async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime> {
-  options.season = options.season || getCurrentSeason()
-  options.seasonYear = options.seasonYear || getCurrentSeasonYear()
+  if (options.season === undefined || options.seasonYear === undefined) {
+    options.season = getCurrentSeason()
+    options.seasonYear = getCurrentSeasonYear()
+  }
+
   options.malIdIn = options.malIdIn || undefined
   options.aniIdIn = options.aniIdIn || undefined
   options.sort = options.sort || ['START_DATE'];
@@ -237,14 +242,19 @@ async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime>
   async function request(): Promise<AiringAnime> {
     page++
 
-    const { data } = await makeRequest({
+    const requestOptions = {
       page: page,
-      season: options.season,
-      seasonYear: options.seasonYear,
       malIdIn: options.malIdIn,
       aniIdIn: options.aniIdIn,
       sort: options.sort
-    })
+    }
+
+    if (options.season && options.seasonYear) {
+      requestOptions['season'] = options.season
+      requestOptions['seasonYear'] = options.seasonYear
+    }
+
+    const { data } = await makeRequest(requestOptions)
 
     const hasNextPage = data.Page.pageInfo.hasNextPage
 
