@@ -134,7 +134,6 @@ const airingAnimeQuery = `
 				idMal_in: $malIdIn,
 				id_in: $aniIdIn,
         sort: $sort
-        status: RELEASING
 			) {
         id
         description

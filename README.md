@@ -40,8 +40,7 @@ currentlyAiringAnime({
 })
 ```
 
-See the `example/` folder for an implementation example for the browser.
-
+See the `example/` folder for an implementation example for the browser and node (with babel preset es2015).
 
 #### Show object
 

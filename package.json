@@ -3,10 +3,12 @@
   "version": "0.1.1",
   "description": "Get currently airing anime shows via a simple API",
   "scripts": {
-    "build": "tsc && rollup currentlyAiringAnime.js --format umd --name currentlyAiringAnime --output currentlyAiringAnime.js"
+    "build": "tsc && rollup ./lib/currentlyAiringAnime.js --format umd --name currentlyAiringAnime --output ./lib/currentlyAiringAnime.umd.js && rollup ./lib/currentlyAiringAnime.js --format cjs --output ./lib/currentlyAiringAnime.commonjs.js"
   },
-  "main": "currentlyAiringAnime.js",
-  "types": "currentlyAiringAnime.d.ts",
+  "module": "lib/currentlyAiringAnime.js",
+  "main": "lib/currentlyAiringAnime.commonjs.js",
+  "browser": "lib/currentlyAiringAnime.umd.js",
+  "types": "lib/currentlyAiringAnime.d.ts",
   "author": "Rick Lancee <https://github.com/ricklancee/>",
   "repository": {
     "type": "git",
