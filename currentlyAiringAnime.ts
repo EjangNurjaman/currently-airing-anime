@@ -114,7 +114,7 @@ export type AiringAnime = {
 
 const apiEndpoint = 'https://graphql.anilist.co'
 
-const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
+const getAiringAnimeQuery = (includeSchedule: boolean) => `
   query (
     $page: Int
     $season: MediaSeason
