@@ -36,7 +36,8 @@ currentlyAiringAnime({
   seasonYear: 2017,
   malIdIn: [34914, 34902, 34881], // Include only these MyAnimeList Ids
   aniIdIn: [98292, 98291, 98251], // Include only these AniList ids
-  sort: ['START_DATE'] // An array of sort options (see below for all sort options)
+  sort: ['START_DATE'], // An array of sort options (see below for all sort options)
+  includeSchedule: true // Include an array of the airing schedule
 })
 ```
 
@@ -74,6 +75,12 @@ show {
     airingAt
     timeUntilAiring
   }
+  startDate {
+    year
+    month
+    day
+  }
+  // Airing shedule gets included if option includeSchedule is true
   airingSchedule {
     edges {
       node {

@@ -119,8 +119,7 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 		$seasonYear: Int
 		$malIdIn: [Int]
 		$aniIdIn: [Int]
-    $sort: [MediaSort],
-    $status: MediaStatus
+    $sort: [MediaSort]
   ) {
     Page (page: $page) {
       pageInfo {
@@ -136,8 +135,7 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 				seasonYear: $seasonYear
 				idMal_in: $malIdIn,
 				id_in: $aniIdIn,
-        sort: $sort,
-        status: $status
+        sort: $sort
 			) {
         id
         description
@@ -161,6 +159,11 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
           large
         }
         episodes
+        startDate {
+          year
+          month
+          day
+        }
         nextAiringEpisode {
           id
           episode
