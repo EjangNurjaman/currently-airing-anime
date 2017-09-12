@@ -3,11 +3,10 @@ export declare type MediaSort = 'ID' | 'ID_DESC' | 'TITLE_ROMAJI' | 'TITLE_ROMAJ
 export declare type Options = {
     malIdIn?: number | number[];
     aniIdIn?: number | number[];
-    userId?: number | number[];
-    season?: Season | false;
-    includeLeftovers?: boolean;
-    seasonYear?: number | number[] | false;
-    sort?: [string];
+    season?: Season | boolean;
+    includeSchedule?: boolean;
+    seasonYear?: number | number[] | boolean;
+    sort?: string[];
 };
 export declare type AiringEpisode = {
     id: number;

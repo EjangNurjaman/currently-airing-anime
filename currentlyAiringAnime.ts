@@ -33,11 +33,20 @@ export type MediaSort =
 export type Options = {
   malIdIn?: number | number[]
   aniIdIn?: number | number[]
-  userId?: number | number[]
-  season?: Season | false
-  includeLeftovers?: boolean,
-  seasonYear?: number | number[] | false
-  sort?: [string]
+  season?: Season | boolean
+  includeSchedule?: boolean
+  seasonYear?: number | number[] | boolean
+  sort?: string[]
+}
+
+type RequestOptions = {
+  page: number
+  malIdIn?: number | number[]
+  aniIdIn?: number | number[]
+  includeSchedule: boolean
+  season?: Season | boolean
+  seasonYear?: number | number[] | boolean
+  sort?: string[]
 }
 
 type PageInfo = {
@@ -102,14 +111,6 @@ export type AiringAnime = {
 }
 
 const apiEndpoint = 'https://graphql.anilist.co'
-
-const requestOptions = {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
-}
 
 const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
   query (
@@ -182,8 +183,6 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
   }
 `
 
-const leftoverQuery = ``;
-
 // WINTER: Months December to February
 // SPRING: Months March to Spring
 // SUMMER: Months June to August
@@ -210,12 +209,18 @@ function getCurrentSeasonYear(): number {
   return (new Date()).getFullYear()
 }
 
-async function sendFetchRequest(variables: object): Promise<ApiResponse> {
-  const fetchOptions = Object.assign(requestOptions, {
-    body: JSON.stringify({ query: getAiringAnimeQuery(), variables })
+async function sendFetchRequest(query, variables: object): Promise<ApiResponse> {
+  const options = Object.assign({
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  }, {
+    body: JSON.stringify({ query, variables })
   })
 
-  const response = await fetch(apiEndpoint, fetchOptions)
+  const response = await fetch(apiEndpoint, options)
 
   const result = await response.json() as ApiResponse
 
@@ -225,6 +230,26 @@ async function sendFetchRequest(variables: object): Promise<ApiResponse> {
 
   return result
 }
+
+function makeRequestFactory(requestOptions: RequestOptions): () => Promise<AiringAnime> {
+  const includeSchedule = requestOptions.includeSchedule
+  delete requestOptions.includeSchedule
+
+  return async function makeRequest() {
+
+    const { data } = await sendFetchRequest(getAiringAnimeQuery(includeSchedule), requestOptions)
+
+    const hasNextPage = data.Page.pageInfo.hasNextPage
+
+    requestOptions.page = requestOptions.page + 1
+
+    return {
+      shows: data.Page.media,
+      next: hasNextPage ? makeRequest : null
+    }
+  }
+}
+
 
 async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime> {
   const amountOfOptions = Object.keys(options).length;
@@ -245,35 +270,16 @@ async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime>
     throw new Error('malIdIn should be an array')
   }
 
-  function makeRequestFactory(page: number = 1): () => Promise<AiringAnime> {
-
-    return async function makeRequest() {
-      const requestOptions = {
-        page: page,
-        malIdIn: options.malIdIn,
-        aniIdIn: options.aniIdIn,
-        sort: options.sort
-      }
-
-      if (options.season && options.seasonYear) {
-        requestOptions['season'] = options.season
-        requestOptions['seasonYear'] = options.seasonYear
-      }
-
-      const { data } = await sendFetchRequest(requestOptions)
-
-      const hasNextPage = data.Page.pageInfo.hasNextPage
-
-      page++
-
-      return {
-        shows: data.Page.media,
-        next: hasNextPage ? makeRequest : null
-      }
-    }
-  }
-
-  return await makeRequestFactory()()
+  // User called media data.
+  return await makeRequestFactory({
+    page: 1,
+    malIdIn: options.malIdIn,
+    aniIdIn: options.aniIdIn,
+    sort: options.sort,
+    season: options.season,
+    seasonYear: options.seasonYear,
+    includeSchedule: options.includeSchedule,
+  })()
 }
 
 export default currentlyAiringAnime
