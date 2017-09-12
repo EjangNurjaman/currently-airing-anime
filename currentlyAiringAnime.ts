@@ -35,6 +35,7 @@ export type Options = {
   aniIdIn?: number | number[]
   season?: Season | boolean
   includeSchedule?: boolean
+  isReleasing?: boolean
   seasonYear?: number | number[] | boolean
   sort?: string[]
 }
@@ -44,6 +45,7 @@ type RequestOptions = {
   malIdIn?: number | number[]
   aniIdIn?: number | number[]
   includeSchedule: boolean
+  status?: 'RELEASING'
   season?: Season | boolean
   seasonYear?: number | number[] | boolean
   sort?: string[]
@@ -120,6 +122,7 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 		$malIdIn: [Int]
 		$aniIdIn: [Int]
     $sort: [MediaSort]
+    $status: MediaStatus
   ) {
     Page (page: $page) {
       pageInfo {
@@ -136,6 +139,7 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 				idMal_in: $malIdIn,
 				id_in: $aniIdIn,
         sort: $sort
+        status: $status
 			) {
         id
         description
@@ -282,6 +286,7 @@ async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime>
     season: options.season,
     seasonYear: options.seasonYear,
     includeSchedule: options.includeSchedule,
+    status: options.isReleasing ? 'RELEASING' : undefined,
   })()
 }
 
