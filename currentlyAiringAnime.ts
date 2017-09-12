@@ -34,8 +34,8 @@ export type Options = {
   malIdIn?: number | number[]
   aniIdIn?: number | number[]
   userId?: number | number[]
-  season?: Season
-  seasonYear?: number | number[]
+  season?: Season | false
+  seasonYear?: number | number[] | false
   sort?: [string]
 }
 
@@ -110,7 +110,7 @@ const requestOptions = {
   }
 }
 
-const airingAnimeQuery = `
+const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
   query (
     $page: Int
     $season: MediaSeason
@@ -163,15 +163,17 @@ const airingAnimeQuery = `
           airingAt
           timeUntilAiring
         }
-        airingSchedule {
-          edges {
-            node {
-              episode
-              airingAt
-              timeUntilAiring
+        ${includeSchedule ? `
+          airingSchedule {
+            edges {
+              node {
+                episode
+                airingAt
+                timeUntilAiring
+              }
             }
           }
-        }
+        ` : ''}
       }
     }
   }
@@ -205,7 +207,7 @@ function getCurrentSeasonYear(): number {
 
 async function makeRequest(variables: object): Promise<ApiResponse> {
   const fetchOptions = Object.assign(requestOptions, {
-    body: JSON.stringify({ query: airingAnimeQuery, variables })
+    body: JSON.stringify({ query: getAiringAnimeQuery(), variables })
   })
 
   const response = await fetch(apiEndpoint, fetchOptions)
@@ -220,7 +222,8 @@ async function makeRequest(variables: object): Promise<ApiResponse> {
 }
 
 async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime> {
-  if (options.season === undefined || options.seasonYear === undefined) {
+  const amountOfOptions = Object.keys(options).length;
+  if (!amountOfOptions || (amountOfOptions === 1 && options.sort !== undefined)) {
     options.season = getCurrentSeason()
     options.seasonYear = getCurrentSeasonYear()
   }

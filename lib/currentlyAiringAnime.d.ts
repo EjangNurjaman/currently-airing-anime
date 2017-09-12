@@ -4,8 +4,8 @@ export declare type Options = {
     malIdIn?: number | number[];
     aniIdIn?: number | number[];
     userId?: number | number[];
-    season?: Season;
-    seasonYear?: number | number[];
+    season?: Season | false;
+    seasonYear?: number | number[] | false;
     sort?: [string];
 };
 export declare type AiringEpisode = {
