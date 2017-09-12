@@ -35,6 +35,7 @@ export type Options = {
   aniIdIn?: number | number[]
   userId?: number | number[]
   season?: Season | false
+  includeLeftovers?: boolean,
   seasonYear?: number | number[] | false
   sort?: [string]
 }
@@ -117,7 +118,8 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 		$seasonYear: Int
 		$malIdIn: [Int]
 		$aniIdIn: [Int]
-		$sort: [MediaSort]
+    $sort: [MediaSort],
+    $status: MediaStatus
   ) {
     Page (page: $page) {
       pageInfo {
@@ -133,7 +135,8 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
 				seasonYear: $seasonYear
 				idMal_in: $malIdIn,
 				id_in: $aniIdIn,
-        sort: $sort
+        sort: $sort,
+        status: $status
 			) {
         id
         description
@@ -179,6 +182,8 @@ const getAiringAnimeQuery = (includeSchedule: boolean = false) => `
   }
 `
 
+const leftoverQuery = ``;
+
 // WINTER: Months December to February
 // SPRING: Months March to Spring
 // SUMMER: Months June to August
@@ -205,7 +210,7 @@ function getCurrentSeasonYear(): number {
   return (new Date()).getFullYear()
 }
 
-async function makeRequest(variables: object): Promise<ApiResponse> {
+async function sendFetchRequest(variables: object): Promise<ApiResponse> {
   const fetchOptions = Object.assign(requestOptions, {
     body: JSON.stringify({ query: getAiringAnimeQuery(), variables })
   })
@@ -240,33 +245,35 @@ async function currentlyAiringAnime(options: Options = {}): Promise<AiringAnime>
     throw new Error('malIdIn should be an array')
   }
 
-  let page = 0
-  async function request(): Promise<AiringAnime> {
-    page++
+  function makeRequestFactory(page: number = 1): () => Promise<AiringAnime> {
 
-    const requestOptions = {
-      page: page,
-      malIdIn: options.malIdIn,
-      aniIdIn: options.aniIdIn,
-      sort: options.sort
-    }
+    return async function makeRequest() {
+      const requestOptions = {
+        page: page,
+        malIdIn: options.malIdIn,
+        aniIdIn: options.aniIdIn,
+        sort: options.sort
+      }
 
-    if (options.season && options.seasonYear) {
-      requestOptions['season'] = options.season
-      requestOptions['seasonYear'] = options.seasonYear
-    }
+      if (options.season && options.seasonYear) {
+        requestOptions['season'] = options.season
+        requestOptions['seasonYear'] = options.seasonYear
+      }
 
-    const { data } = await makeRequest(requestOptions)
+      const { data } = await sendFetchRequest(requestOptions)
 
-    const hasNextPage = data.Page.pageInfo.hasNextPage
+      const hasNextPage = data.Page.pageInfo.hasNextPage
 
-    return {
-      shows: data.Page.media,
-      next: hasNextPage ? request : null
+      page++
+
+      return {
+        shows: data.Page.media,
+        next: hasNextPage ? makeRequest : null
+      }
     }
   }
 
-  return await request()
+  return await makeRequestFactory()()
 }
 
 export default currentlyAiringAnime

@@ -5,6 +5,7 @@ export declare type Options = {
     aniIdIn?: number | number[];
     userId?: number | number[];
     season?: Season | false;
+    includeLeftovers?: boolean;
     seasonYear?: number | number[] | false;
     sort?: [string];
 };
