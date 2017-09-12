@@ -1,6 +1,6 @@
 {
   "name": "currently-airing-anime",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Get currently airing anime shows via a simple API",
   "scripts": {
     "build": "tsc && rollup ./lib/currentlyAiringAnime.js --format umd --name currentlyAiringAnime --output ./lib/currentlyAiringAnime.umd.js && rollup ./lib/currentlyAiringAnime.js --format cjs --output ./lib/currentlyAiringAnime.commonjs.js"
