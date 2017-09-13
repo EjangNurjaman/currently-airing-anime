@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "description": "Get currently airing anime shows via a simple API",
   "scripts": {
-    "build": "tsc && babel ./lib/currentlyAiringAnime.js -o ./lib/currentlyAiringAnime.es2015.js && rollup ./lib/currentlyAiringAnime.js --format umd --name currentlyAiringAnime --output ./lib/currentlyAiringAnime.js"
+    "build": "tsc && babel ./lib/currentlyAiringAnime.js -o ./lib/currentlyAiringAnime.es2015.js && babel ./lib/currentlyAiringAnime.js -o ./lib/currentlyAiringAnime.js && rollup ./lib/currentlyAiringAnime.js --format umd --name currentlyAiringAnime --output ./lib/currentlyAiringAnime.js"
   },
   "module": "lib/currentlyAiringAnime.es2015.js",
   "main": "lib/currentlyAiringAnime.js",
