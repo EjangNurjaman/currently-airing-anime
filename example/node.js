@@ -1,5 +1,6 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 global.fetch = fetch;
-import currentlyAiringAnime from 'currently-airing-anime';
+
+const currentlyAiringAnime = require('../lib/currentlyAiringAnime.js');
 
 currentlyAiringAnime().then(res => console.log(res));
