@@ -140,6 +140,7 @@ const getAiringAnimeQuery = (includeSchedule: boolean) => `
 				id_in: $aniIdIn,
         sort: $sort
         status: $status
+        isAdult: false
 			) {
         id
         description
